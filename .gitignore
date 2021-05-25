@@ -1,0 +1,15 @@
+/node_modules
+
+# may delete late
+/avif*
+/await*
+/diff
+/jpg*
+/jxl*
+/png*
+/squoosh*/*
+/webp*
+/wp2*
+
+.vscode
+yarn.lock

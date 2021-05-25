@@ -1,0 +1,14 @@
+{
+  "name": "compare-image-files",
+  "version": "1.0.0",
+  "description": "test images in value-only comparison",
+  "main": "index.js",
+  "author": "tomByrer <tombyrer@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "sharp": "^0.28.2"
+  },
+  "scripts":{
+    "start": "node index avif"
+  }
+}
