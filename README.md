@@ -3,7 +3,7 @@
 #### Color value-to-value diff
 
 Compares 2 images on strict color matching, NO psychovisual aproximation.
-Unique to other projects I can find on npm/GitHub is that is uses the very fast [node-sharp](https://sharp.pixelplumbing.com/).  While sharp is scripted using JavaScript, the bulk of the image procssing is a [C lib libvips](https://github.com/libvips/libvips).
+Unique to other projects I can find on npm/GitHub is that this uses the very fast [node-sharp](https://sharp.pixelplumbing.com/).  While sharp is scripted using JavaScript, the bulk of the image procssing is a [C lib libvips](https://github.com/libvips/libvips).
 
 ## Instalation
 

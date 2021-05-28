@@ -43,10 +43,33 @@ main()
 */
 async function testPairs(tSet){ try {
 	console.dir(tSet.pairs)
-	// let pixelsSum = (tSet.sum)
-	// 	? new Uint8ClampedArray(info.size)
-	// 	: null
 	let diffUnequals = 0
+	let diffsSum = {
+		count: {
+			r: 0,
+			g: 0,
+			b: 0,
+			t: 0,
+		},
+		max: {
+			r: 0,
+			g: 0,
+			b: 0,
+			a: 0,
+		},
+		sum: {
+			r: 0,
+			g: 0,
+			b: 0,
+			t: 0,
+		},
+		avg: {
+			r: 0,
+			g: 0,
+			b: 0,
+			t: 0,
+		},
+	}
 	// let shouldOutcome = ''
 
 	/* make diffs */
@@ -57,23 +80,25 @@ async function testPairs(tSet){ try {
 	){
 		const diffCount = await testImgPair(tSet, i)
 
-		// // total of all diffs
-		// for(
-		// 	let pixel = tSet.sum ? 0 : info.size;
-		// 	pixel < info.size;
-		// 	pixel += 1
-		// ){
-		// 	pixelsSum[pixel] += diffCount.data[pixel]
-		// 	pixel++
-		// 	pixelsSum[pixel] += diffCount.data[pixel]
-		// 	pixel++
-		// 	pixelsSum[pixel] += diffCount.data[pixel]
-		// 	if (info.channels === 3) continue
-		// 	pixel++
-		// 	pixelsSum[pixel] = 255 //alpha
-		// }
+		diffsSum.count.r += diffCount.probe.count.r
+		diffsSum.count.g += diffCount.probe.count.g
+		diffsSum.count.b += diffCount.probe.count.b
+		diffsSum.count.t += diffCount.probe.count.t
+		diffsSum.max.r += diffCount.probe.max.r
+		diffsSum.max.g += diffCount.probe.max.g
+		diffsSum.max.b += diffCount.probe.max.b
+		diffsSum.max.a += diffCount.probe.max.a
+		diffsSum.sum.r += diffCount.probe.sum.r
+		diffsSum.sum.g += diffCount.probe.sum.g
+		diffsSum.sum.b += diffCount.probe.sum.b
+		diffsSum.sum.t += diffCount.probe.sum.t
+		diffsSum.avg.r += diffCount.probe.avg.r
+		diffsSum.avg.g += diffCount.probe.avg.g
+		diffsSum.avg.b += diffCount.probe.avg.b
+		diffsSum.avg.t += diffCount.probe.avg.t
 
 		if (tSet.should === 'equal'){
+			console.log(`! probe totals`)
 			if (diffCount.probe.count.t > 0){
 				diffUnequals++
 				console.log(`🚨FAIL`)
@@ -83,6 +108,7 @@ async function testPairs(tSet){ try {
 		}
 	} // end for pairs.length
 
+	console.log('diffsSum =',diffsSum);
 	if (tSet.should === 'equal'){
 		if (diffUnequals > 0){
 			console.log(`🚨FAILED ${diffUnequals/tSet.pairs.length*100}% Equal pairs: ${tSet.title}`)
@@ -90,9 +116,7 @@ async function testPairs(tSet){ try {
 			console.log(`👌pass 100% Equal pairs: ${tSet.title}`)
 		}
 	}
-	// if (pixelsSum){
-	// 	writeImgArr(pixelsSum, info, tSet.dest, 'diff-sum', '', 'simple')
-	// }
+
 } catch (err){
 	console.log('💩testPairs write: ', err);
 }}
