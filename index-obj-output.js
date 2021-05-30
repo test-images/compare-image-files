@@ -3,8 +3,9 @@ const sharp = require('sharp') // image processing github.com/lovell/sharp
 const headlines = require('./headlines')
 const {tests} = require(`./tests.${process.argv[2]}.config`)
 
-// console.dir(tests);
  let reportData = {}
+
+// console.log(tests);
 
 async function main(){
 	for (
@@ -49,7 +50,7 @@ main()
 	},
 */
 async function testPairs(curTest){ try {
-	console.dir(curTest.pairs)
+	// console.log(curTest.pairs)
 	let diffUnequals = 0
 	let diffsSum = {
 		count: {
@@ -87,48 +88,48 @@ async function testPairs(curTest){ try {
 	){
 		const diffRes = await testImgPair(curTest, i)
 
-		reportData[curTest.title].pairs[diffRes.fileStub] = diffRes.probe
+		console.log(diffRes);
+		reportData[curTest.title].pairs[diffRes.fileStub] = diffRes.result
 
-		diffsSum.count.r += diffRes.probe.count.r
-		diffsSum.count.g += diffRes.probe.count.g
-		diffsSum.count.b += diffRes.probe.count.b
-		diffsSum.count.t += diffRes.probe.count.t
-		diffsSum.max.r += diffRes.probe.max.r
-		diffsSum.max.g += diffRes.probe.max.g
-		diffsSum.max.b += diffRes.probe.max.b
-		diffsSum.max.a += diffRes.probe.max.a
-		diffsSum.sum.r += diffRes.probe.sum.r
-		diffsSum.sum.g += diffRes.probe.sum.g
-		diffsSum.sum.b += diffRes.probe.sum.b
-		diffsSum.sum.t += diffRes.probe.sum.t
-		diffsSum.avg.r += diffRes.probe.avg.r
-		diffsSum.avg.g += diffRes.probe.avg.g
-		diffsSum.avg.b += diffRes.probe.avg.b
-		diffsSum.avg.t += diffRes.probe.avg.t
+		diffsSum.count.r += diffRes.count.r
+		diffsSum.count.g += diffRes.count.g
+		diffsSum.count.b += diffRes.count.b
+		diffsSum.count.t += diffRes.count.t
+		diffsSum.max.r += diffRes.max.r
+		diffsSum.max.g += diffRes.max.g
+		diffsSum.max.b += diffRes.max.b
+		diffsSum.max.a += diffRes.max.a
+		diffsSum.sum.r += diffRes.sum.r
+		diffsSum.sum.g += diffRes.sum.g
+		diffsSum.sum.b += diffRes.sum.b
+		diffsSum.sum.t += diffRes.sum.t
+		diffsSum.avg.r += diffRes.avg.r
+		diffsSum.avg.g += diffRes.avg.g
+		diffsSum.avg.b += diffRes.avg.b
+		diffsSum.avg.t += diffRes.avg.t
 
 		if (curTest.should === 'equal'){
-			console.log(`! probe totals`)
-			if (diffRes.probe.count.t > 0){
+			logger(`! probe totals`)
+			if (diffRes.count.t > 0){
 				diffUnequals++
-				console.log(`🚨FAIL`)
+				logger(`🚨FAIL`)
 			} else {
-				console.log(`👌pass`)
+				logger(`👌pass`)
 			}
 		}
 	} // end for pairs.length
 
-	console.log('diffsSum =',diffsSum);
-	// if (curTest.should === 'equal'){
-		reportData[curTest.title].unequalPercent = diffUnequals/curTest.pairs.length*100
+	logger('diffsSum =',diffsSum);
+	if (curTest.should === 'equal'){
 		if (diffUnequals > 0){
-			console.log(`🚨FAILED ${reportData[curTest.title].unequalPercent}% Equal pairs: ${curTest.title}`)
+			// console.log(`🚨FAILED ${diffUnequals/curTest.pairs.length*100}% Equal pairs: ${curTest.title}`)
 		} else {
-			console.log(`👌pass All pairs equal: ${curTest.title}`)
+			// console.log(`👌pass 100% Equal pairs: ${curTest.title}`)
 		}
-	// }
+	}
 
 } catch (err){
-	console.log('💩testPairs write: ', err);
+	// console.log('💩testPairs write: ', err);
 }}
 
 // function getFilesizeBytes(filename) {
@@ -146,7 +147,7 @@ function signalBoost(x){
  * @param  {int} i Index
  */
 async function testImgPair(curTest, i){ try{
-	console.log(`➰`);
+	// console.log(`➰`);
 	const origImg = await loadUint8Arr(curTest.orig + curTest.pairs[i][0]) // refernce
 	const compareImg = await loadUint8Arr(curTest.compare + curTest.pairs[i][1]) // comparative
 	const fileStub = curTest.pairs[i][0].replaceAll('/','~') +'_'+ curTest.pairs[i][1].replaceAll('/','~')
@@ -158,10 +159,10 @@ async function testImgPair(curTest, i){ try{
 		origImg.info,
 		curTest.title,
 	);
-	console.log('diffRes '+ fileStub, diffRes);
+	// console.log('diffRes '+ fileStub, diffRes);
 	return diffRes
 } catch (err){
-	console.log('💩testImgPair: ', filepath, err);
+	// console.log('💩testImgPair: ', filepath, err);
 }
 }
 
@@ -263,25 +264,25 @@ async function pixelDiff(origArr, compArr, diffPath, fileStub, info, title){
 
 		//assume no alpha channel
 	}
-	// console.log('pixelsDiff', pixelsDiff);
+	// // console.log('pixelsDiff', pixelsDiff);
 	const countTotal = countDiffR + countDiffG + countDiffB
 
-		console.log(countTotal, fileStub);
+		logger(countTotal, fileStub);
 	//TODO test for folder
 	try {
 		await writeImgArr(pixelsDiff, info, diffPath, fileStub, '.diff', title, 'simple', !!countTotal)
-		// console.log(countTotal);
+		// // console.log(countTotal);
 		if (countTotal){
 			await writeImgArr(pixelsDiffAmp, info, diffPath, fileStub, '.diffamp', title, 'amplify', !!countTotal)
 		}
 	} catch (err){
-		console.log('💩pixelDiff write: ', err);
+		logger('💩pixelDiff write: ', err);
 	}
 
 	const sumTotal = sumDiffR + sumDiffG + sumDiffB
 	return {
 		fileStub,
-		probe: {
+		result: {
 			count: {
 				r: countDiffR,
 				g: countDiffG,
@@ -306,16 +307,26 @@ async function pixelDiff(origArr, compArr, diffPath, fileStub, info, title){
 				b: sumDiffB / countDiffB,
 				t: sumTotal / countTotal,
 			},
-	}}
+		}
+	}
 }
+
 
 async function loadUint8Arr(filepath){ try {
 	let raw = await sharp(filepath)
 		.removeAlpha()
 		.raw()
 		.toBuffer({ resolveWithObject: true })
-	// console.log(`raw`, raw)
+	// // console.log(`raw`, raw)
 	return raw
 } catch (err){
-	console.log('💩loadUint8Arr: ', filepath, err);
+	logger('💩loadUint8Arr: ', {filepath, err});
 }}
+
+function logger(title, data){
+	if (data){
+		// console.log('logger: '+ title, data);
+	}else{
+		// console.log('log: '+ title);
+	}
+}
