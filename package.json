@@ -9,6 +9,6 @@
     "sharp": "^0.28.2"
   },
   "scripts":{
-    "start": "node index avif"
+    "start": "node index avif-tests.202105"
   }
 }

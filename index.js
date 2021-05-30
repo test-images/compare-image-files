@@ -1,8 +1,8 @@
 let fs = require('fs')
 const sharp = require('sharp') // image processing github.com/lovell/sharp
 const headlines = require('./headlines')
-const {tests} = require(`./tests.${process.argv[2]}.config`)
-
+const {tests} = require(`./${process.argv[2]}.config`)
+const destFolderRoot = `../${process.argv[2]}/`
 // console.dir(tests);
  let reportData = {}
 
@@ -15,8 +15,9 @@ async function main(){
 		++i
 	){
 		curTest = tests[keyNames[i]]
-		if (!fs.existsSync(curTest.dest+'headline')) {
-			fs.mkdirSync(curTest.dest +'headline', {recursive:true});
+		curTest.destFolder = destFolderRoot + curTest.destSubFolder
+		if (!fs.existsSync(curTest.destFolder+'headline')) {
+			fs.mkdirSync(curTest.destFolder +'headline', {recursive:true});
 		}
 		if(curTest.title === undefined){
 			curTest.title = keyNames[i].replaceAll('_',' ')
@@ -153,7 +154,7 @@ async function testImgPair(curTest, i){ try{
 	const diffRes = await pixelDiff(
 		new Uint8ClampedArray(origImg.data.buffer),
 		new Uint8ClampedArray(compareImg.data.buffer),
-		curTest.dest,
+		curTest.destFolder,
 		fileStub,
 		origImg.info,
 		curTest.title,
