@@ -9,29 +9,29 @@ async function main(){
 	for (
 		let i = 0,
 			keyNames = Object.keys(tests),
-			currentTest = {};
+			curTest = {};
 		i < keyNames.length;
 		++i
 	){
-		currentTest = tests[keyNames[i]]
-		if (!fs.existsSync(currentTest.dest+'headline')) {
-			fs.mkdirSync(currentTest.dest +'headline', {recursive:true});
+		curTest = tests[keyNames[i]]
+		if (!fs.existsSync(curTest.dest+'headline')) {
+			fs.mkdirSync(curTest.dest +'headline', {recursive:true});
 		}
-		if(currentTest.title === undefined){
-			currentTest.title = keyNames[i].replaceAll('_',' ')
+		if(curTest.title === undefined){
+			curTest.title = keyNames[i].replaceAll('_',' ')
 		}
 
-		if(currentTest.should === 'equal'){
-			await testPairs(currentTest)
-		// }else if(currentTest.sum !== undefined){
-		// 	testPairs(currentTest)
+		if(curTest.should === 'equal'){
+			await testPairs(curTest)
+		// }else if(curTest.sum !== undefined){
+		// 	testPairs(curTest)
 		}else console.error();
 	}
 }
 main()
 
 /*
-	tSet is object:
+	curTest is object:
 	{
 		should: `equal`,
 		src:`squoosh/`,
@@ -41,8 +41,8 @@ main()
 		],
 	},
 */
-async function testPairs(tSet){ try {
-	console.dir(tSet.pairs)
+async function testPairs(curTest){ try {
+	console.dir(curTest.pairs)
 	let diffUnequals = 0
 	let diffsSum = {
 		count: {
@@ -75,31 +75,31 @@ async function testPairs(tSet){ try {
 	/* make diffs */
 	for (
 		let i = 0;
-		i < tSet.pairs.length;
+		i < curTest.pairs.length;
 		++i
 	){
-		const diffCount = await testImgPair(tSet, i)
+		const diffRes = await testImgPair(curTest, i)
 
-		diffsSum.count.r += diffCount.probe.count.r
-		diffsSum.count.g += diffCount.probe.count.g
-		diffsSum.count.b += diffCount.probe.count.b
-		diffsSum.count.t += diffCount.probe.count.t
-		diffsSum.max.r += diffCount.probe.max.r
-		diffsSum.max.g += diffCount.probe.max.g
-		diffsSum.max.b += diffCount.probe.max.b
-		diffsSum.max.a += diffCount.probe.max.a
-		diffsSum.sum.r += diffCount.probe.sum.r
-		diffsSum.sum.g += diffCount.probe.sum.g
-		diffsSum.sum.b += diffCount.probe.sum.b
-		diffsSum.sum.t += diffCount.probe.sum.t
-		diffsSum.avg.r += diffCount.probe.avg.r
-		diffsSum.avg.g += diffCount.probe.avg.g
-		diffsSum.avg.b += diffCount.probe.avg.b
-		diffsSum.avg.t += diffCount.probe.avg.t
+		diffsSum.count.r += diffRes.probe.count.r
+		diffsSum.count.g += diffRes.probe.count.g
+		diffsSum.count.b += diffRes.probe.count.b
+		diffsSum.count.t += diffRes.probe.count.t
+		diffsSum.max.r += diffRes.probe.max.r
+		diffsSum.max.g += diffRes.probe.max.g
+		diffsSum.max.b += diffRes.probe.max.b
+		diffsSum.max.a += diffRes.probe.max.a
+		diffsSum.sum.r += diffRes.probe.sum.r
+		diffsSum.sum.g += diffRes.probe.sum.g
+		diffsSum.sum.b += diffRes.probe.sum.b
+		diffsSum.sum.t += diffRes.probe.sum.t
+		diffsSum.avg.r += diffRes.probe.avg.r
+		diffsSum.avg.g += diffRes.probe.avg.g
+		diffsSum.avg.b += diffRes.probe.avg.b
+		diffsSum.avg.t += diffRes.probe.avg.t
 
-		if (tSet.should === 'equal'){
+		if (curTest.should === 'equal'){
 			console.log(`! probe totals`)
-			if (diffCount.probe.count.t > 0){
+			if (diffRes.probe.count.t > 0){
 				diffUnequals++
 				console.log(`🚨FAIL`)
 			} else {
@@ -109,11 +109,11 @@ async function testPairs(tSet){ try {
 	} // end for pairs.length
 
 	console.log('diffsSum =',diffsSum);
-	if (tSet.should === 'equal'){
+	if (curTest.should === 'equal'){
 		if (diffUnequals > 0){
-			console.log(`🚨FAILED ${diffUnequals/tSet.pairs.length*100}% Equal pairs: ${tSet.title}`)
+			console.log(`🚨FAILED ${diffUnequals/curTest.pairs.length*100}% Equal pairs: ${curTest.title}`)
 		} else {
-			console.log(`👌pass 100% Equal pairs: ${tSet.title}`)
+			console.log(`👌pass 100% Equal pairs: ${curTest.title}`)
 		}
 	}
 
@@ -132,24 +132,24 @@ function signalBoost(x){
 }
 /** loads 2 files to return comaprison results
  * @warning Since JS passes by value, might be faster to inline vs functon
- * @param  {object} tSet
+ * @param  {object} curTest
  * @param  {int} i Index
  */
-async function testImgPair(tSet, i){ try{
+async function testImgPair(curTest, i){ try{
 	console.log(`➰`);
-	const origImg = await loadUint8Arr(tSet.orig + tSet.pairs[i][0]) // refernce
-	const compareImg = await loadUint8Arr(tSet.compare + tSet.pairs[i][1]) // comparative
-	const fileStub = tSet.pairs[i][0].replaceAll('/','~') +'_'+ tSet.pairs[i][1].replaceAll('/','~')
-	const diffCount = await pixelDiff(
+	const origImg = await loadUint8Arr(curTest.orig + curTest.pairs[i][0]) // refernce
+	const compareImg = await loadUint8Arr(curTest.compare + curTest.pairs[i][1]) // comparative
+	const fileStub = curTest.pairs[i][0].replaceAll('/','~') +'_'+ curTest.pairs[i][1].replaceAll('/','~')
+	const diffRes = await pixelDiff(
 		new Uint8ClampedArray(origImg.data.buffer),
 		new Uint8ClampedArray(compareImg.data.buffer),
-		tSet.dest,
+		curTest.dest,
 		fileStub,
 		origImg.info,
-		tSet.title,
+		curTest.title,
 	);
-	console.log('diffCount '+ fileStub, diffCount);
-	return diffCount
+	console.log('diffRes '+ fileStub, diffRes);
+	return diffRes
 } catch (err){
 	console.log('💩testImgPair: ', filepath, err);
 }
@@ -270,7 +270,7 @@ async function pixelDiff(origArr, compArr, diffPath, fileStub, info, title){
 
 	const sumTotal = sumDiffR + sumDiffG + sumDiffB
 	return {
-		data: pixelsDiff,
+		fileStub,
 		probe: {
 			count: {
 				r: countDiffR,
