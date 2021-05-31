@@ -36,7 +36,7 @@ async function main(){
 	fs.writeFile(tests.meta.destRootFolder + shortISOnow +'.report.json', JSON.stringify(reportData), function (err) {
 		if (err) throw err;
 	});
-	console.dir(JSON.stringify(reportData, null, 2));
+	// console.log(JSON.stringify(reportData, null, 2));
 }
 main()
 
@@ -52,7 +52,7 @@ main()
 	},
 */
 async function testPairs(curTest){ try {
-	console.dir(curTest.pairs)
+	console.group(`➰${curTest.title}\n ${curTest.destFolder}`)
 	let diffUnequals = 0
 	let diffsSum = {
 		count: {
@@ -109,29 +109,30 @@ async function testPairs(curTest){ try {
 		diffsSum.avg.b += diffRes.probe.avg.b
 		diffsSum.avg.t += diffRes.probe.avg.t
 
+		// console.group engaged
 		if (curTest.should === 'equal'){
-			console.log(`! probe totals`)
 			if (diffRes.probe.count.t > 0){
 				diffUnequals++
-				console.log(`🚨FAIL`)
+				console.log(`🚨FAIL`, diffRes.probe.count.t, diffRes.fileStub)
 			} else {
-				console.log(`👌pass`)
+				console.log(`👌pass`, diffRes.fileStub)
 			}
 		}
 	} // end for pairs.length
 
-	console.log('diffsSum =',diffsSum);
+	// console.log('diffsSum =',diffsSum);
 	// if (curTest.should === 'equal'){
+		console.groupEnd()
 		reportData[curTest.title].unequalPercent = diffUnequals/curTest.pairs.length*100
 		if (diffUnequals > 0){
-			console.log(`🚨FAILED ${reportData[curTest.title].unequalPercent}% Equal pairs: ${curTest.title}`)
+			console.log(`🚨FAILED ${reportData[curTest.title].unequalPercent}% Equal pairs\n`)
 		} else {
-			console.log(`👌pass All pairs equal: ${curTest.title}`)
+			console.log(`👌pass All pairs equal\n`)
 		}
 	// }
 
 } catch (err){
-	console.log('💩testPairs write: ', err);
+	console.error('💩testPairs write: ', err)
 }}
 
 // function getFilesizeBytes(filename) {
@@ -149,7 +150,6 @@ function signalBoost(x){
  * @param  {int} i Index
  */
 async function testImgPair(curTest, i){ try{
-	console.log(`➰`);
 	const origImg = await loadUint8Arr(curTest.folders.orig + curTest.pairs[i][0]) // refernce
 	const compareImg = await loadUint8Arr(curTest.folders.compare + curTest.pairs[i][1]) // comparative
 	const fileStub = curTest.pairs[i][0].replaceAll('/','~') +'_'+ curTest.pairs[i][1].replaceAll('/','~')
@@ -161,10 +161,10 @@ async function testImgPair(curTest, i){ try{
 		origImg.info,
 		curTest.title,
 	);
-	console.log('diffRes '+ fileStub, diffRes);
+	// console.log('diffRes '+ fileStub, diffRes);
 	return diffRes
 } catch (err){
-	console.log('💩testImgPair: ', filepath, err);
+	console.error('💩testImgPair: ', filepath, err)
 }
 }
 
@@ -269,7 +269,6 @@ async function pixelDiff(origArr, compArr, diffPath, fileStub, info, title){
 	// console.log('pixelsDiff', pixelsDiff);
 	const countTotal = countDiffR + countDiffG + countDiffB
 
-		console.log(countTotal, fileStub);
 	//TODO test for folder
 	try {
 		await writeImgArr(pixelsDiff, info, diffPath, fileStub, '.diff', title, 'simple', !!countTotal)
@@ -278,7 +277,7 @@ async function pixelDiff(origArr, compArr, diffPath, fileStub, info, title){
 			await writeImgArr(pixelsDiffAmp, info, diffPath, fileStub, '.diffamp', title, 'amplify', !!countTotal)
 		}
 	} catch (err){
-		console.log('💩pixelDiff write: ', err);
+		console.error('💩pixelDiff write: ', err)
 	}
 
 	const sumTotal = sumDiffR + sumDiffG + sumDiffB
@@ -320,5 +319,5 @@ async function loadUint8Arr(filepath){ try {
 	// console.log(`raw`, raw)
 	return raw
 } catch (err){
-	console.log('💩loadUint8Arr: ', filepath, err);
+	console.error('💩loadUint8Arr: ', filepath, err)
 }}
