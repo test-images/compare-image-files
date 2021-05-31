@@ -2,20 +2,19 @@ let fs = require('fs')
 const sharp = require('sharp') // image processing github.com/lovell/sharp
 const headlines = require('./headlines')
 const {tests} = require(`./${process.argv[2]}.config`)
-const destFolderRoot = `../${process.argv[2]}/`
 // console.dir(tests);
  let reportData = {}
 
 async function main(){
 	for (
-		let i = 0,
+		let i = 1, // index 0 = meta, no tests
 			keyNames = Object.keys(tests),
 			curTest = {};
 		i < keyNames.length;
 		++i
 	){
 		curTest = tests[keyNames[i]]
-		curTest.destFolder = destFolderRoot + curTest.destSubFolder
+		curTest.destFolder = tests.meta.destRootFolder + curTest.folders.destSub
 		if (!fs.existsSync(curTest.destFolder+'headline')) {
 			fs.mkdirSync(curTest.destFolder +'headline', {recursive:true});
 		}
@@ -33,7 +32,10 @@ async function main(){
 		// 	testPairs(curTest)
 		}else console.error();
 	}
-
+	const shortISOnow = new Date().toISOString().replaceAll(/[-:.]/g, '')
+	fs.writeFile(tests.meta.destRootFolder + shortISOnow +'.report.json', JSON.stringify(reportData), function (err) {
+		if (err) throw err;
+	});
 	console.dir(JSON.stringify(reportData, null, 2));
 }
 main()
@@ -148,8 +150,8 @@ function signalBoost(x){
  */
 async function testImgPair(curTest, i){ try{
 	console.log(`➰`);
-	const origImg = await loadUint8Arr(curTest.orig + curTest.pairs[i][0]) // refernce
-	const compareImg = await loadUint8Arr(curTest.compare + curTest.pairs[i][1]) // comparative
+	const origImg = await loadUint8Arr(curTest.folders.orig + curTest.pairs[i][0]) // refernce
+	const compareImg = await loadUint8Arr(curTest.folders.compare + curTest.pairs[i][1]) // comparative
 	const fileStub = curTest.pairs[i][0].replaceAll('/','~') +'_'+ curTest.pairs[i][1].replaceAll('/','~')
 	const diffRes = await pixelDiff(
 		new Uint8ClampedArray(origImg.data.buffer),
