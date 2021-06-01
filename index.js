@@ -240,7 +240,7 @@ async function pixelDiff(origArr, compArr, diffPath, fileStub, info, title){
 		}
 
 		//assume no alpha channel
-		countDiffAny += diffAny
+		countDiffAny += (diffAny === true) ? 1 : 0
 	}
 	// console.log('pixelsDiff', pixelsDiff);
 	const countTotal = countDiffR + countDiffG + countDiffB
