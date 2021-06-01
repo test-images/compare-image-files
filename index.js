@@ -52,31 +52,13 @@ main()
 	},
 */
 async function testPairs(curTest){ try {
-	console.group(`➰${curTest.title}\n ${curTest.destFolder}`)
+	console.group(`\n➰${curTest.title}\n ${curTest.destFolder}`)
 	let diffUnequals = 0
 	let diffsSum = {
 		count: {
-			r: 0,
-			g: 0,
-			b: 0,
-			t: 0,
-		},
-		max: {
-			r: 0,
-			g: 0,
-			b: 0,
-			a: 0,
+			any: 0,
 		},
 		sum: {
-			r: 0,
-			g: 0,
-			b: 0,
-			t: 0,
-		},
-		avg: {
-			r: 0,
-			g: 0,
-			b: 0,
 			t: 0,
 		},
 	}
@@ -92,22 +74,8 @@ async function testPairs(curTest){ try {
 
 		reportData[curTest.title].pairs[diffRes.fileStub] = diffRes.probe
 
-		diffsSum.count.r += diffRes.probe.count.r
-		diffsSum.count.g += diffRes.probe.count.g
-		diffsSum.count.b += diffRes.probe.count.b
-		diffsSum.count.t += diffRes.probe.count.t
-		diffsSum.max.r += diffRes.probe.max.r
-		diffsSum.max.g += diffRes.probe.max.g
-		diffsSum.max.b += diffRes.probe.max.b
-		diffsSum.max.a += diffRes.probe.max.a
-		diffsSum.sum.r += diffRes.probe.sum.r
-		diffsSum.sum.g += diffRes.probe.sum.g
-		diffsSum.sum.b += diffRes.probe.sum.b
+		diffsSum.count.any += diffRes.probe.count.any
 		diffsSum.sum.t += diffRes.probe.sum.t
-		diffsSum.avg.r += diffRes.probe.avg.r
-		diffsSum.avg.g += diffRes.probe.avg.g
-		diffsSum.avg.b += diffRes.probe.avg.b
-		diffsSum.avg.t += diffRes.probe.avg.t
 
 		// console.group engaged
 		if (curTest.should === 'equal'){
@@ -125,9 +93,9 @@ async function testPairs(curTest){ try {
 		console.groupEnd()
 		reportData[curTest.title].unequalPercent = diffUnequals/curTest.pairs.length*100
 		if (diffUnequals > 0){
-			console.log(`🚨FAILED ${reportData[curTest.title].unequalPercent}% Equal pairs\n`)
+			console.log(`🚨FAILED ${reportData[curTest.title].unequalPercent}% pairs,`, diffsSum.count.any, `pixels wrong, total color err=`, diffsSum.sum.t)
 		} else {
-			console.log(`👌pass All pairs equal\n`)
+			console.log(`👌pass All pairs equal`)
 		}
 	// }
 
@@ -225,6 +193,8 @@ async function pixelDiff(origArr, compArr, diffPath, fileStub, info, title){
 	countDiffR = 0
 	countDiffG = 0
 	countDiffB = 0
+	countDiffAny = 0
+	diffAny = false
 	maxDiffR = 0
 	maxDiffG = 0
 	maxDiffB = 0
@@ -238,9 +208,12 @@ async function pixelDiff(origArr, compArr, diffPath, fileStub, info, title){
 		pixel < info.size;
 		pixel += 1
 	){
+		diffAny = false
 		pixelsDiff[pixel] = origArr[pixel] - compArr[pixel]
 		if (pixelsDiff[pixel]){
-			pixelsDiffAmp[pixel] = pixelsDiff[pixel] * 0.9 + 25 //'signal boost' to visually notice diff
+			//'signal boost' to visually notice diff
+			pixelsDiffAmp[pixel] = pixelsDiff[pixel] * 0.9 + 25
+			diffAny = true
 			countDiffR++
 			maxDiffR = Math.max(maxDiffR, pixelsDiff[pixel])
 			sumDiffR += pixelsDiff[pixel]
@@ -250,6 +223,7 @@ async function pixelDiff(origArr, compArr, diffPath, fileStub, info, title){
 		pixelsDiff[pixel] = origArr[pixel] - compArr[pixel]
 		if (pixelsDiff[pixel]){
 			pixelsDiffAmp[pixel] = pixelsDiff[pixel] * 0.9 + 25
+			diffAny = true
 			countDiffG++
 			maxDiffG = Math.max(maxDiffG, pixelsDiff[pixel])
 			sumDiffG += pixelsDiff[pixel]
@@ -259,12 +233,14 @@ async function pixelDiff(origArr, compArr, diffPath, fileStub, info, title){
 		pixelsDiff[pixel] = origArr[pixel] - compArr[pixel]
 		if (pixelsDiff[pixel]){
 			pixelsDiffAmp[pixel] = pixelsDiff[pixel] * 0.9 + 25
+			diffAny = true
 			countDiffB++
 			maxDiffB = Math.max(maxDiffB, pixelsDiff[pixel])
 			sumDiffB += pixelsDiff[pixel]
 		}
 
 		//assume no alpha channel
+		countDiffAny += diffAny
 	}
 	// console.log('pixelsDiff', pixelsDiff);
 	const countTotal = countDiffR + countDiffG + countDiffB
@@ -289,6 +265,7 @@ async function pixelDiff(origArr, compArr, diffPath, fileStub, info, title){
 				g: countDiffG,
 				b: countDiffB,
 				t: countTotal,
+				any: countDiffAny,
 			},
 			max: {
 				r: maxDiffR,
@@ -306,7 +283,7 @@ async function pixelDiff(origArr, compArr, diffPath, fileStub, info, title){
 				r: sumDiffR / countDiffR,
 				g: sumDiffG / countDiffG,
 				b: sumDiffB / countDiffB,
-				t: sumTotal / countTotal,
+				a: sumTotal / countTotal,
 			},
 	}}
 }
