@@ -128,11 +128,21 @@ async function testImgPair(curTest, i){ try{
 		fileStub,
 		origImg.info,
 		curTest.title,
-	);
+	)
+	//optimize the prvious & following could be promice.all
+	const {size: origFilesize} = fs.statSync(curTest.folders.orig + curTest.pairs[i][0])
+	//ugly puppeteer screen captures always capture as .png
+	const {size: compareSrcFilesize} = fs.statSync(curTest.folders.src + curTest.pairs[i][1].slice(0,-4))
+	const filesize = {}
+	filesize.orig = origFilesize
+	filesize.compare = compareSrcFilesize
+	filesize.diff = compareSrcFilesize/origFilesize*100
+	diffRes.probe.filesize = filesize
+	console.log(diffRes);
 	// console.log('diffRes '+ fileStub, diffRes);
 	return diffRes
 } catch (err){
-	console.error('💩testImgPair: ', filepath, err)
+	console.error('💩testImgPair: ', err)
 }
 }
 
@@ -240,6 +250,7 @@ async function pixelDiff(origArr, compArr, diffPath, fileStub, info, title){
 		}
 
 		//assume no alpha channel
+		// comments: https://stackoverflow.com/a/7820695/1324588
 		countDiffAny += (diffAny === true) ? 1 : 0
 	}
 	// console.log('pixelsDiff', pixelsDiff);
