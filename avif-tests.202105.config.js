@@ -12,7 +12,7 @@ exports.tests = {
 			compare :`../avif-results/202105/screenshots/lossless7/canary/`,
 			destSub:`squoosh/lossless7/canary/`,
 			// to get AVIF filesizes only
-			src:`../avif/202105/squoosh/losssless7`,
+			src:`../avif/202105/squoosh/losssless7/`,
 		},
 		pairs:[
 			[`cs-gray-7f7f7f.png`,
@@ -33,7 +33,7 @@ exports.tests = {
 			compare :`../avif-results/202105/screenshots/lossless7/fxdev/`,
 			destSub:`squoosh/lossless7/fxdev/`,
 			// to get AVIF filesizes only
-			src:`../avif/202105/squoosh/losssless7`,
+			src:`../avif/202105/squoosh/losssless7/`,
 		},
 		pairs:[
 			[`cs-gray-7f7f7f.png`,
@@ -54,7 +54,7 @@ exports.tests = {
 			compare :`../avif-results/202105/screenshots/lossy7chromahalf/canary/`,
 			destSub:`squoosh/lossy7chromahalf/canary/`,
 			// to get AVIF filesizes only
-			src:`../avif/202105/squoosh/lossy7chromahalf`,
+			src:`../avif/202105/squoosh/lossy7chromahalf/`,
 		},
 		pairs:[
 			[`cs-gray-7f7f7f.png`,
@@ -75,7 +75,7 @@ exports.tests = {
 			compare :`../avif-results/202105/screenshots/lossy7chromahalf/fxdev/`,
 			destSub:`squoosh/lossy7chromahalf/fxdev/`,
 			// to get AVIF filesizes only
-			src:`../avif/202105/squoosh/lossy7chromahalf`,
+			src:`../avif/202105/squoosh/lossy7chromahalf/`,
 		},
 		pairs:[
 			[`cs-gray-7f7f7f.png`,
@@ -96,7 +96,7 @@ exports.tests = {
 			compare :`../avif-results/202105/screenshots/lossy7chromaoff/canary/`,
 			destSub:`squoosh/lossy7chromaoff/canary/`,
 			// to get AVIF filesizes only
-			src:`../avif/202105/squoosh/lossy7chromaoff`,
+			src:`../avif/202105/squoosh/lossy7chromaoff/`,
 		},
 		pairs:[
 			[`cs-gray-7f7f7f.png`,
@@ -117,7 +117,7 @@ exports.tests = {
 			compare :`../avif-results/202105/screenshots/lossy7chromaoff/fxdev/`,
 			destSub:`squoosh/lossy7chromaoff/fxdev/`,
 			// to get AVIF filesizes only
-			src:`../avif/202105/squoosh/lossy7chromaoff`,
+			src:`../avif/202105/squoosh/lossy7chromaoff/`,
 		},
 		pairs:[
 			[`cs-gray-7f7f7f.png`,

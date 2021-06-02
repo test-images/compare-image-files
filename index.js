@@ -54,13 +54,17 @@ main()
 async function testPairs(curTest){ try {
 	console.group(`\n➰${curTest.title}\n ${curTest.destFolder}`)
 	let diffUnequals = 0
-	let diffsSum = {
-		count: {
+	let diffsSum ={
+		count:{
 			any: 0,
 		},
-		sum: {
+		sum:{
 			t: 0,
 		},
+		filesize:{
+			orig: 0,
+			compare: 0,
+		}
 	}
 	// let shouldOutcome = ''
 
@@ -76,6 +80,8 @@ async function testPairs(curTest){ try {
 
 		diffsSum.count.any += diffRes.probe.count.any
 		diffsSum.sum.t += diffRes.probe.sum.t
+		diffsSum.filesize.orig += diffRes.probe.filesize.orig
+		diffsSum.filesize.compare += diffRes.probe.filesize.compare
 
 		// console.group engaged
 		if (curTest.should === 'equal'){
@@ -97,6 +103,7 @@ async function testPairs(curTest){ try {
 		} else {
 			console.log(`👌pass All pairs equal`)
 		}
+		console.info(`Total filesize differance:`, +(diffsSum.filesize.compare/diffsSum.filesize.orig*100).toFixed(2), `%`);
 	// }
 
 } catch (err){
@@ -117,33 +124,32 @@ function signalBoost(x){
  * @param  {object} curTest
  * @param  {int} i Index
  */
-async function testImgPair(curTest, i){ try{
-	const origImg = await loadUint8Arr(curTest.folders.orig + curTest.pairs[i][0]) // refernce
-	const compareImg = await loadUint8Arr(curTest.folders.compare + curTest.pairs[i][1]) // comparative
-	const fileStub = curTest.pairs[i][0].replaceAll('/','~') +'_'+ curTest.pairs[i][1].replaceAll('/','~')
-	const diffRes = await pixelDiff(
-		new Uint8ClampedArray(origImg.data.buffer),
-		new Uint8ClampedArray(compareImg.data.buffer),
-		curTest.destFolder,
-		fileStub,
-		origImg.info,
-		curTest.title,
-	)
-	//optimize the prvious & following could be promice.all
-	const {size: origFilesize} = fs.statSync(curTest.folders.orig + curTest.pairs[i][0])
-	//ugly puppeteer screen captures always capture as .png
-	const {size: compareSrcFilesize} = fs.statSync(curTest.folders.src + curTest.pairs[i][1].slice(0,-4))
-	const filesize = {}
-	filesize.orig = origFilesize
-	filesize.compare = compareSrcFilesize
-	filesize.diff = compareSrcFilesize/origFilesize*100
-	diffRes.probe.filesize = filesize
-	console.log(diffRes);
-	// console.log('diffRes '+ fileStub, diffRes);
-	return diffRes
-} catch (err){
-	console.error('💩testImgPair: ', err)
-}
+async function testImgPair(curTest, i){
+	try{
+		const origImg = await loadUint8Arr(curTest.folders.orig + curTest.pairs[i][0]) // refernce
+		const compareImg = await loadUint8Arr(curTest.folders.compare + curTest.pairs[i][1]) // comparative
+		const fileStub = curTest.pairs[i][0].replaceAll('/','~') +'_'+ curTest.pairs[i][1].replaceAll('/','~')
+		const diffRes = await pixelDiff(
+			new Uint8ClampedArray(origImg.data.buffer),
+			new Uint8ClampedArray(compareImg.data.buffer),
+			curTest.destFolder,
+			fileStub,
+			origImg.info,
+			curTest.title,
+		)
+		//optimize the prvious & following could be promice.all
+		const {size: origFilesize} = fs.statSync(curTest.folders.orig + curTest.pairs[i][0])
+		//ugly puppeteer screen captures always capture as .png
+		const {size: compareSrcFilesize} = fs.statSync(curTest.folders.src + curTest.pairs[i][1].slice(0,-4))
+		const filesize = {}
+		filesize.orig = origFilesize
+		filesize.compare = compareSrcFilesize
+		filesize.diff = compareSrcFilesize/origFilesize*100
+		diffRes.probe.filesize = filesize
+		return diffRes
+	} catch (err){
+		console.error('💩testImgPair: ', err)
+	}
 }
 
 	/** Write to file the test results
