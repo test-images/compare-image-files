@@ -103,6 +103,7 @@ async function testPairs(curTest){ try {
 		} else {
 			console.log(`👌pass All pairs equal`)
 		}
+		// console.info(diffsSum.filesize.orig, 'vs', diffsSum.filesize.compare)
 		console.info(`Total filesize differance:`, +(diffsSum.filesize.compare/diffsSum.filesize.orig*100).toFixed(2), `%`);
 	// }
 
@@ -138,9 +139,9 @@ async function testImgPair(curTest, i){
 			curTest.title,
 		)
 		//optimize the prvious & following could be promice.all
-		const {size: origFilesize} = fs.statSync(curTest.folders.orig + curTest.pairs[i][0])
+		const {size: origFilesize} = fs.statSync(curTest.folders.src.orig + curTest.pairs[i][0].replace(`.avif.png`,`.avif`))
 		//ugly puppeteer screen captures always capture as .png
-		const {size: compareSrcFilesize} = fs.statSync(curTest.folders.src + curTest.pairs[i][1].slice(0,-4))
+		const {size: compareSrcFilesize} = fs.statSync(curTest.folders.src.compare + curTest.pairs[i][1].replace(`.avif.png`,`.avif`))
 		const filesize = {}
 		filesize.orig = origFilesize
 		filesize.compare = compareSrcFilesize
